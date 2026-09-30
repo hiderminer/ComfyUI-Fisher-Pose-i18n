@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+
+# Built-in OpenPose skeletons: not redistributed here. Copy them from the original
+# Work-Fisher/ComfyUI-Fisher-Pose repository (or their provider); see pose-images/README.md.
+pose-images/*
+!pose-images/README.md
+
+# Qwen's system_prompt_edit.txt (Qwen Research License, non-commercial) is not redistributed;
+# a copy supplied by the user for the PE rewrite stays local.
+/system_prompt_edit.txt

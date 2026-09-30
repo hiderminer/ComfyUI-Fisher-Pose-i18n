@@ -1,0 +1,131 @@
+https://github.com/user-attachments/assets/24dc201a-d9dc-4ac7-86a8-acc9d8f6dd7c
+
+<div align="center">
+
+# Fisher Pose · 机位与姿态
+
+**给 Qwen Image 2.1 用的姿势与机位编辑插件：拖一拖 3D 人偶，或者点一张 OpenPose 骨架图，人物就摆成你要的样子。**
+
+[English](README.md) · 中文 · [日本語](readme-jp.md)
+
+![ComfyUI](https://img.shields.io/badge/ComfyUI-custom%20node-6e8cff)
+![Qwen Image 2.1](https://img.shields.io/badge/Qwen%20Image-2.1-8a5cf6)
+![VNCCS PoseStudio LoRA](https://img.shields.io/badge/LoRA-VNCCS%20PoseStudio%20QI2.1-f59e0b)
+![License](https://img.shields.io/badge/license-MIT-22c55e)
+
+![骨架 → 人偶 → 成图](docs/images/hero.jpg)
+
+</div>
+
+> 本仓库是 [Work-Fisher/ComfyUI-Fisher-Pose](https://github.com/Work-Fisher/ComfyUI-Fisher-Pose) 的多语言分支，界面跟随 ComfyUI 的语言设置（中文 / 日本語 / English）。不附带内置骨架图（见「安装」）。
+
+## 能做什么
+
+| 模式 | 节点 | 一句话 |
+|---|---|---|
+| **自由姿势** | `Fisher Qwen2.1 自由姿势` | 单人任意摆姿：真人比例 3D 人偶 + VNCCS PoseStudio LoRA，把参考图里的人物重画成新姿势 |
+| **自由视角** | `Fisher Qwen2.1 人物与姿态编码` | 1–3 人共用机位：转镜头、改站位与动作，中文编辑指令，可接 PE 扩写（[详细说明](docs/自由视角详细说明.md)） |
+
+### 自由姿势亮点
+
+- **真人比例人偶**：采用 [VNCCS Pose Studio](https://github.com/AHEKOT/ComfyUI_VNCCS_Utils) 的 MakeHuman 人偶，和 LoRA 训练时用的人偶一致，模型认得出。
+- **OpenPose 一键摆姿**：点一张彩色骨架图就能摆好。2D 骨架没有前后信息，插件按骨长缩短量推算深度；估错时，躯干和四肢各段都能一键在前后之间翻转。
+- **FISHER小彩蛋**：209 张骨架图，涵盖站、坐、跪、蹲、躺、劈叉、悬空等姿势，打开就能点。（本分支不附带这些图片，需另行复制到 `pose-images/`，见「安装」。）
+- **我的图库**：自己的骨架图选一次就会保存下来，下次打开自动载入。
+- **我的姿势**：摆好的姿势一键保存，连同体型、比例、画面位置和手势一起存下来，下次点缩略图就能恢复，换工作流也能用。保存在 `ComfyUI/user/default/fisher_pose/poses/`，每个姿势一个 JSON 文件，可以直接拷给别人。
+- **自由视角编辑，正面输出**：拖空白处随意转视角、拖关节摆姿（手、脚、髋部可 IK）、Shift+拖动移动人物；输出固定为 VNCCS 的正面相机。
+- **手势预设**：张开、并拢、握拳，外加握紧程度滑杆。
+- **比例调整**：头部大小、脖子、肩宽、躯干、上臂、小臂、大腿、小腿都可以单独拉长或缩短，姿势保持不变。
+- **两个尺寸互不影响**：人偶图尺寸在编辑器里设；输出尺寸由节点的 width/height 决定，可以直接接分辨率节点。
+- **应用即预览**：点「应用到节点」后，人偶图立刻显示在节点上，不用先跑一遍工作流。
+
+## 效果
+
+![效果展示](docs/images/showcase-v2.jpg)
+
+<sub>示例人物图为 AI 生成。人偶图是 image1，人物图是 image2，提示词固定为 `Draw character from image2`。</sub>
+
+## 编辑器
+
+![自由姿势编辑器](docs/images/editor.jpg)
+
+- **左侧**：FISHER小彩蛋 / 我的图库、我的姿势、深度修正、手势。
+- **中间**：3D 视口。橙色框是输出画面，右下角小图是实际的正面输出。
+- **右侧**：人物在画面中的大小、位置和转身，人偶图尺寸，关节微调，体型，头颈与四肢比例。
+
+## 安装
+
+把本插件文件夹复制（或 clone）到 `ComfyUI/custom_nodes`，然后重启 ComfyUI 并刷新浏览器。插件不需要额外安装 Python 依赖，节点搜 `Fisher` 就能找到。
+
+从网盘下载的请确认 `web/vnccs/assets/` 里有约 86MB 的 `pose_studio_makehuman.v2.bin`，缺了它编辑器打不开人偶。
+
+**内置骨架图（本分支不附带）：** 请从原仓库 [Work-Fisher/ComfyUI-Fisher-Pose](https://github.com/Work-Fisher/ComfyUI-Fisher-Pose) 的 `FISHER小彩蛋/` 文件夹（或其提供者）把 `1.png`、`2.png`…… 复制到本插件的 `pose-images/` 文件夹。这些图片已加入 `.gitignore`。没有图片时只是编辑器的内置列表为空。详见 [pose-images/README.md](pose-images/README.md)。
+
+**自由姿势需要的模型：**
+
+| 文件 | 放到 | 说明 |
+|---|---|---|
+| `qwen_image_2.1_*.safetensors` | `models/diffusion_models` | Qwen Image 2.1 主模型 |
+| `qwen3vl_8b_*.safetensors` | `models/text_encoders` | 类型选 `qwen_image` |
+| `qwen_image_2.1_vae_*.safetensors` | `models/vae` | |
+| `VNCCS_QI2_PoseStudioV1.1.safetensors` | `models/loras` | **必需**，强度 1。下载：[MIUProject/VNCCS_PoseStudio_QI2.1](https://huggingface.co/MIUProject/VNCCS_PoseStudio_QI2.1) |
+
+ComfyUI 需要是带 `TextEncodeQwenImage21` 节点的新版本。
+
+## 快速上手（自由姿势）
+
+1. 拖入 `workflows/Fisher-Qwen2.1-自由姿势-VNCCS-LoRA.json`，在「人物图 → image2」节点里选你的人物照片。
+2. 点节点上的 **「打开自由姿势编辑器」**，在左侧 FISHER小彩蛋 里点一张骨架图，或者自己拖关节摆姿势。
+3. 需要时用「深度修正」翻转前后、调整手势和人物大小，然后点 **「应用到节点」**。
+4. 设置输出宽高，点运行。推荐参数：25 步、cfg 1、euler / simple，和 VNCCS 官方一致。
+
+> `extra_prompt` 会另起一行附在固定指令后面，建议写英文，例如 `soft studio light`。
+
+## 数据保存位置
+
+路径以 ComfyUI 仓库的顶层为基准（默认值；使用 `--user-directory`、`--input-directory`、`--temp-directory` 时，`user`、`input`、`temp` 部分会相应改变）。
+
+| 数据 | 位置 | 说明 |
+|---|---|---|
+| **我的姿势**（自由姿势编辑器「＋ 保存当前姿势」） | `user/default/fisher_pose/poses/<姿势名>.json` | 每个姿势一个 JSON 文件，包含体型、比例、画面位置、手势和缩略图，可以直接拷给别人。 |
+| **我的图库**（自己的 OpenPose 骨架图） | `input/fisher_openpose/` | 通过 ComfyUI 上传的副本。「清空」只删除这些副本，不影响原文件。 |
+| **内置骨架图** | `custom_nodes/<本插件>/pose-images/` | 只读。本分支不附带（见「安装」）。 |
+| **应用到节点的姿势 / 机位 / 人物** | 工作流 JSON 内（隐藏的 `pose_json` / `scene_json` 控件） | 包含 base64 格式的人偶图，以及多人编辑器保存的镜头。保存的工作流位于 `user/default/workflows/`。 |
+| **节点上的预览图**（「应用到节点」后显示） | `temp/fisher_freepose_<哈希>.png` | 临时文件，重启 ComfyUI 后可能被删除。 |
+| **在 ComfyUI 外单独打开的多人编辑器** | 浏览器 localStorage（键 `fisher-pose-multi-v2`） | 在 ComfyUI 中打开时不使用。 |
+
+## 界面语言
+
+- 节点与编辑器界面支持简体中文、日本語、English，跟随 ComfyUI 的语言设置（Settings → Comfy → Locale）；其他语言显示英文。
+- 发送给模型的中文编辑指令、`Draw character from image2`、以及保存在工作流中的选项值（输出模式、提示词格式、`自动`/`图1..3`）保持不变，旧工作流可直接打开。
+- 错误信息统一为英文。
+
+## 致谢
+
+这个插件的自由姿势模式建立在以下开源工作之上，感谢各位作者的付出：
+
+- **[VNCCS Utils](https://github.com/AHEKOT/ComfyUI_VNCCS_Utils) · [MiuProject / AHEKOT](https://github.com/AHEKOT)**：提供了 Pose Studio 人偶核心（`PoseViewerCore`、IK、截图）、MakeHuman 人体包加载、手部预设，以及 **[VNCCS PoseStudio QI2.1 LoRA](https://huggingface.co/MIUProject/VNCCS_PoseStudio_QI2.1)** 和它的训练约定（人偶 = image1，人物 = image2，`Draw character from image2`）。如果没有这套人偶和 LoRA，就没有这个自由姿势模式。代码以 MIT 许可随本仓库分发于 `web/vnccs/`，改动说明见该目录的 README。欢迎去原仓库点个星。
+- **[MakeHuman](http://www.makehumancommunity.org/)**：人体网格与形体数据（CC0 1.0）。
+- **[Qwen Image 2.1](https://github.com/QwenLM/Qwen-Image-2.1)**：生图模型，以及 [prompt_rewrite](https://github.com/QwenLM/Qwen-Image-2.1/tree/main/prompt_rewrite) 编辑指令规范（用于自由视角模式）。
+- **[three.js](https://threejs.org/)**：3D 渲染（MIT）。
+- **[ControlNet](https://github.com/lllyasviel/ControlNet)**：OpenPose 骨架的配色与连接顺序参考。
+- **[ComfyUI-qwenmultiangle](https://github.com/jtydhr88/ComfyUI-qwenmultiangle)**：视角分档与镜头词汇参考。
+- **[ComfyUI](https://github.com/comfyanonymous/ComfyUI)**：插件运行的平台。
+
+## 许可
+
+- 本插件代码：[MIT](LICENSE)。
+- `web/vnccs/`：VNCCS Utils（MIT, © 2025 MiuProject）；MakeHuman 人体包（CC0 1.0）；three.js（MIT）。
+- `web/editor/vendor/`：three.js（MIT）。
+- `system_prompt_edit.txt`（Qwen 的 PE 扩写系统模板，来自 [Qwen Image 2.1 prompt_rewrite](https://github.com/QwenLM/Qwen-Image-2.1/blob/main/prompt_rewrite/prompts/system_prompt_edit.txt)，Qwen Research License，仅限非商业用途）**本分支不附带**。如需在自由视角节点的 PE 扩写中使用 Qwen 的完整模板，请自行下载、确认其许可后放入插件文件夹（已加入 `.gitignore`）。没有该文件时使用内置的简短模板。
+- 使用 LoRA 和基础模型时，请遵守它们各自的许可。
+
+## 已知限制
+
+- 自由姿势目前只支持单人。OpenPose 图里有多人时，只取身形最大的那个人。
+- 2D 骨架无法唯一确定前后深度，复杂姿势需要手动翻转或微调。头部朝向、手指、脚掌不会从骨架读取。
+- 人偶图只提供姿势。输出比例和人偶图差别很大时，人物在画面里的位置由模型决定。
+
+---
+
+更多：[自由视角模式详细说明](docs/自由视角详细说明.md)
